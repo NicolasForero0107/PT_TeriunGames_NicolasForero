@@ -53,7 +53,16 @@ public class CharacterMovementHandler : NetworkBehaviour
             //jump
             if (networkInputData.isJumpPressed)
                 networkCharacterControllerPrototypeCustom.Jump();
+
+            //check if we fell
+            CheckFallRespawn();
         }
+    }
+
+    void CheckFallRespawn()
+    {
+        if (transform.position.y < 12)
+            transform.position = Utils.GetRandomSpawnPoint();
     }
 
     public void SetViewInputVector(Vector2 viewInput)
