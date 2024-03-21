@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
 
 public class LocalCameraHandler : MonoBehaviour
 {
@@ -14,7 +15,7 @@ public class LocalCameraHandler : MonoBehaviour
     float cameraRotationY = 0;
 
     //other components
-    //Cinemachine.CinemachineVirtualCamera localCamera; will be used later
+    public CinemachineVirtualCamera cinemachineVirtualCamera;
     NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom;
     public Camera localCamera;
 
@@ -39,6 +40,30 @@ public class LocalCameraHandler : MonoBehaviour
 
         if (!localCamera.enabled)
             return;
+
+        if (cinemachineVirtualCamera == null)
+            cinemachineVirtualCamera = FindObjectOfType<CinemachineVirtualCamera>();
+        else
+        {
+            if (NetworkPlayer.local.is3rdPersonCamera)
+            {
+                if (!cinemachineVirtualCamera.enabled)
+                {
+
+                    cinemachineVirtualCamera.enabled = true;
+                }
+
+                cinemachineVirtualCamera.Follow = NetworkPlayer.local.playerModel;
+                cinemachineVirtualCamera.LookAt = NetworkPlayer.local.playerModel;
+
+                //let the camera be handled by cinemachine
+                return;
+            }
+            else
+            {
+                //do nothing, bool will not switch
+            }
+        }
 
         //move cam to position of the player
         localCamera.transform.position = cameraAnchorPoint.position;

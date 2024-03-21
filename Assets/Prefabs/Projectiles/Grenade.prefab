@@ -56,7 +56,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.5
+  m_Radius: 0.15
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &1255377972209140998
 Rigidbody:
@@ -151,7 +151,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  explosionParticleSystemPrefab: {fileID: 0}
+  explosionParticleSystemPrefab: {fileID: 3111555545354925136, guid: e8a36c3e28a05e04cb499b3cccdcee38, type: 3}
+  collisionLayers:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!1 &5623726398717217818
 GameObject:
   m_ObjectHideFlags: 0

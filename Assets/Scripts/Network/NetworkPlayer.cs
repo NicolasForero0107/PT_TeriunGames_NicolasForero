@@ -9,6 +9,8 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
     public TextMeshProUGUI playerNickNameTM;
     public static NetworkPlayer local { get; set; }
 
+    public Transform playerModel;
+
     [Networked(OnChanged = nameof(OnNickNameChanged))]
     public NetworkString<_16> nickName { get; set; }
 
@@ -19,6 +21,9 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
 
     public LocalCameraHandler localCameraHandler;
     public GameObject localUI;
+
+    //camera mode
+    public bool is3rdPersonCamera = true;
 
     //other components
     NetworkInGameMessages networkInGameMessages;
@@ -58,6 +63,8 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
             localUI.SetActive(true);
 
             RPC_SetNickName(GameManager.instance.playerNickName);
+
+            RPC_CameraMode(is3rdPersonCamera);
 
             Debug.Log("Spawned local player");
         }
@@ -125,6 +132,14 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
 
             isPublicJoinMessageSent = true;
         }
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_CameraMode(bool is3rdPersonCamera, RpcInfo info = default)
+    {
+        Debug.Log($"[RPC] SetCameraMode, is3rdPersonCamera {is3rdPersonCamera}");
+
+        this.is3rdPersonCamera = is3rdPersonCamera;
     }
 
     void OnDestroy()

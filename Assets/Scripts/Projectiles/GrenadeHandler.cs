@@ -5,7 +5,11 @@ using Fusion;
 
 public class GrenadeHandler : NetworkBehaviour
 {
+    [Header("Prefabs")]
     public GameObject explosionParticleSystemPrefab;
+
+    [Header("Collision Detection")]
+    public LayerMask collisionLayers;
 
     //thrown by info
     PlayerRef thrownByPlayerRef;
@@ -13,6 +17,9 @@ public class GrenadeHandler : NetworkBehaviour
 
     //timing
     TickTimer explodeTickTimer = TickTimer.None;
+
+    //hitinfo
+    List<LagCompensatedHit> hits = new List<LagCompensatedHit>();
 
     //other components
     NetworkObject networkObject;
@@ -36,6 +43,16 @@ public class GrenadeHandler : NetworkBehaviour
         {
             if (explodeTickTimer.Expired(Runner))
             {
+                int hitCount = Runner.LagCompensation.OverlapSphere(transform.position, 4, thrownByPlayerRef, hits, collisionLayers);
+
+                for(int i = 0; i < hitCount; i++)
+                {
+                    HPHandler hpHandler = hits[i].Hitbox.transform.root.GetComponent<HPHandler>();
+
+                    if (hpHandler != null)
+                        hpHandler.OnTakeDamage(thrownByPlayerName, 3);
+                }
+
                 Runner.Despawn(networkObject);
 
                 //stop explode timer from being triggered
