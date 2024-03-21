@@ -28,11 +28,15 @@ public class HPHandler : NetworkBehaviour
     //other components
     HitboxRoot hitboxRoot;
     CharacterMovementHandler characterMovementHandler;
+    NetworkInGameMessages networkInGameMessages;
+    NetworkPlayer networkPlayer;
 
     private void Awake()
     {
         characterMovementHandler = GetComponent<CharacterMovementHandler>();
         hitboxRoot = GetComponentInChildren<HitboxRoot>();
+        networkPlayer = GetComponent<NetworkPlayer>();
+        networkInGameMessages = GetComponent<NetworkInGameMessages>();
     }
 
     // Start is called before the first frame update
@@ -69,7 +73,7 @@ public class HPHandler : NetworkBehaviour
     }
 
     //only called on the server
-    public void OnTakeDamage()
+    public void OnTakeDamage(string damageCausedByPlayerNickname)
     {
         //only take damage while alive
         if (isDead)
@@ -81,6 +85,8 @@ public class HPHandler : NetworkBehaviour
         //player died
         if (HP <= 0)
         {
+            networkInGameMessages.SendInGameRPCMessage(damageCausedByPlayerNickname, $"Killed <b>{networkPlayer.nickName.ToString()}</b>");
+
             Debug.Log($"{Time.time} {transform.name} died");
 
             StartCoroutine(ServerReviveCO());

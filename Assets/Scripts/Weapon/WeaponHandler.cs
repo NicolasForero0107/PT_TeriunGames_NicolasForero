@@ -16,10 +16,12 @@ public class WeaponHandler : NetworkBehaviour
 
     //other components
     HPHandler hpHandler;
+    NetworkPlayer networkPlayer;
 
     private void Awake()
     {
         hpHandler = GetComponent<HPHandler>();
+        networkPlayer = GetBehaviour<NetworkPlayer>();
     }
 
     // Start is called before the first frame update
@@ -62,7 +64,7 @@ public class WeaponHandler : NetworkBehaviour
             Debug.Log($"{Time.time} {transform.name} hit hitbox {hitinfo.Hitbox.transform.root.name}");
 
             if (Object.HasStateAuthority)
-                hitinfo.Hitbox.transform.root.GetComponent<HPHandler>().OnTakeDamage();
+                hitinfo.Hitbox.transform.root.GetComponent<HPHandler>().OnTakeDamage(networkPlayer.nickName.ToString());
 
             isHitOtherPlayer = true;
 

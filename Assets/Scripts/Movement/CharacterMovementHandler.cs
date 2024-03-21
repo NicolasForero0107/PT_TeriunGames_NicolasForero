@@ -10,12 +10,15 @@ public class CharacterMovementHandler : NetworkBehaviour
     //other components
     NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom;
     HPHandler hpHandler;
-
+    NetworkInGameMessages networkInGameMessages;
+    NetworkPlayer networkPlayer;
 
     private void Awake()
     {
         networkCharacterControllerPrototypeCustom = GetComponent<NetworkCharacterControllerPrototypeCustom>();
         hpHandler = GetComponent<HPHandler>();
+        networkInGameMessages = GetComponent<NetworkInGameMessages>();
+        networkPlayer = GetComponentInParent<NetworkPlayer>();
     }
 
     // Start is called before the first frame update
@@ -71,6 +74,8 @@ public class CharacterMovementHandler : NetworkBehaviour
             if (Object.HasStateAuthority)
             {
                 Debug.Log($"{Time.time} Respawn due to fall outside of map at position {transform.position}");
+
+                networkInGameMessages.SendInGameRPCMessage(networkPlayer.nickName.ToString(), "fell off the world!");
 
                 Respawn();
             }
