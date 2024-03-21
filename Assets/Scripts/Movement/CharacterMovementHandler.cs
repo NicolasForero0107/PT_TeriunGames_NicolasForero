@@ -5,19 +5,17 @@ using Fusion;
 
 public class CharacterMovementHandler : NetworkBehaviour
 {
+    bool isRespawnRequested = false;
+
     //other components
     NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom;
-    //CameraFollowObjectComponent cameraFollowObjectComponent;
-    Camera localCamera;
-
+    HPHandler hpHandler;
 
 
     private void Awake()
     {
         networkCharacterControllerPrototypeCustom = GetComponent<NetworkCharacterControllerPrototypeCustom>();
-        //cameraFollowObjectComponent = GetComponentInChildren<CameraFollowObjectComponent>();
-        localCamera = GetComponentInChildren<Camera>();
-
+        hpHandler = GetComponent<HPHandler>();
     }
 
     // Start is called before the first frame update
@@ -28,7 +26,20 @@ public class CharacterMovementHandler : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        if(GetInput(out NetworkInputData networkInputData))
+        if (Object.HasStateAuthority)
+        {
+            if (isRespawnRequested)
+            {
+                Respawn();
+                return;
+            }
+            //dont update position when dead
+            if (hpHandler.isDead)
+                return;
+        }
+
+        //get input from network
+        if (GetInput(out NetworkInputData networkInputData))
         {
             //rotate the trnasform according to the client aim vector
             transform.forward = networkInputData.aimForwardVector;
@@ -56,6 +67,32 @@ public class CharacterMovementHandler : NetworkBehaviour
     void CheckFallRespawn()
     {
         if (transform.position.y < -12)
-            transform.position = Utils.GetRandomSpawnPoint();
+        {
+            if (Object.HasStateAuthority)
+            {
+                Debug.Log($"{Time.time} Respawn due to fall outside of map at position {transform.position}");
+
+                Respawn();
+            }
+        }
+    }
+
+    public void RequestRespawn()
+    {
+        isRespawnRequested = true;
+    }
+
+    void Respawn()
+    {
+        networkCharacterControllerPrototypeCustom.TeleportToPosition(Utils.GetRandomSpawnPoint());
+
+        hpHandler.OnRespawned();
+
+        isRespawnRequested = false;
+    }
+
+    public void SetCharacterControllerEnabled(bool isEnabled)
+    {
+        networkCharacterControllerPrototypeCustom.Controller.enabled = isEnabled;
     }
 }

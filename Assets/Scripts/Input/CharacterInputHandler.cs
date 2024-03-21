@@ -7,13 +7,16 @@ public class CharacterInputHandler : MonoBehaviour
     Vector2 moveInputVector = Vector2.zero;
     Vector2 viewInputVector = Vector2.zero;
     bool isJumpButtonPressed = false;
+    bool isFireButtonPressed = false;
 
     //other components
     LocalCameraHandler localCameraHandler;
+    CharacterMovementHandler characterMovementHandler;
 
     private void Awake()
     {
         localCameraHandler = GetComponentInChildren<LocalCameraHandler>();
+        characterMovementHandler = GetComponent<CharacterMovementHandler>();
     }
 
     // Start is called before the first frame update
@@ -26,6 +29,9 @@ public class CharacterInputHandler : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!characterMovementHandler.Object.HasInputAuthority)
+            return;
+
         //view input
         viewInputVector.x = Input.GetAxis("Mouse X");
         viewInputVector.y = Input.GetAxis("Mouse Y") * -1; //invert the mouse look
@@ -37,6 +43,10 @@ public class CharacterInputHandler : MonoBehaviour
         //jump
         if(Input.GetButtonDown("Jump"))
             isJumpButtonPressed = true;
+
+        //fire
+        if (Input.GetButtonDown("Fire1"))
+            isFireButtonPressed = true;
 
         //set view
         localCameraHandler.SetViewInputVector(viewInputVector);
@@ -55,8 +65,12 @@ public class CharacterInputHandler : MonoBehaviour
         //jump data
         networkInputData.isJumpPressed = isJumpButtonPressed;
 
+        //fire data
+        networkInputData.isFireButtonPressed = isFireButtonPressed;
+
         //reset variables now that we have read their states
         isJumpButtonPressed = false;
+        isFireButtonPressed = false;
 
         return networkInputData;
     }
