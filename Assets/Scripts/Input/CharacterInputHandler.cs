@@ -8,11 +8,12 @@ public class CharacterInputHandler : MonoBehaviour
     Vector2 viewInputVector = Vector2.zero;
     bool isJumpButtonPressed = false;
 
-    CharacterMovementHandler characterMovementHandler;
+    //other components
+    LocalCameraHandler localCameraHandler;
 
     private void Awake()
     {
-        characterMovementHandler = GetComponent<CharacterMovementHandler>();
+        localCameraHandler = GetComponentInChildren<LocalCameraHandler>();
     }
 
     // Start is called before the first frame update
@@ -29,13 +30,16 @@ public class CharacterInputHandler : MonoBehaviour
         viewInputVector.x = Input.GetAxis("Mouse X");
         viewInputVector.y = Input.GetAxis("Mouse Y") * -1; //invert the mouse look
 
-        characterMovementHandler.SetViewInputVector(viewInputVector);
-
         //move input
         moveInputVector.x = Input.GetAxis("Horizontal");
         moveInputVector.y = Input.GetAxis("Vertical");
 
-        isJumpButtonPressed = Input.GetButtonDown("Jump");
+        //jump
+        if(Input.GetButtonDown("Jump"))
+            isJumpButtonPressed = true;
+
+        //set view
+        localCameraHandler.SetViewInputVector(viewInputVector);
     }
 
     public NetworkInputData GetNetworkInput()
@@ -43,13 +47,16 @@ public class CharacterInputHandler : MonoBehaviour
         NetworkInputData networkInputData = new NetworkInputData();
 
         //view data
-        networkInputData.rotationInput = viewInputVector.x;
+        networkInputData.aimForwardVector = localCameraHandler.transform.forward;
 
         //move data
         networkInputData.movementInput = moveInputVector;
 
         //jump data
         networkInputData.isJumpPressed = isJumpButtonPressed;
+
+        //reset variables now that we have read their states
+        isJumpButtonPressed = false;
 
         return networkInputData;
     }

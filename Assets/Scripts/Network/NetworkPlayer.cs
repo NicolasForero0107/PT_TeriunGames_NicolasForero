@@ -25,13 +25,18 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
         else
         {
             //GetComponentInChildren<Cinemachine.CinemachineVirtualCamera>().Priority = 0;
-            Cinemachine.CinemachineVirtualCamera virtualCamera = GetComponentInChildren<Cinemachine.CinemachineVirtualCamera>();
-            virtualCamera.enabled = false;
+            //Cinemachine.CinemachineVirtualCamera virtualCamera = GetComponentInChildren<Cinemachine.CinemachineVirtualCamera>();
+            //virtualCamera.enabled = false;
+            Camera localCamera = GetComponentInChildren<Camera>();
+            localCamera.enabled = false;
 
             AudioListener audioListener = GetComponentInChildren<AudioListener>();
             audioListener.enabled = false;
             Debug.Log("Spawned remote player");
         }
+
+        //make it easier to tell which player is which
+        transform.name = $"P_{Object.Id}";
     }
 
     public void PlayerLeft(PlayerRef player)

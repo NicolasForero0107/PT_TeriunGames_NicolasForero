@@ -4,15 +4,5 @@ using UnityEngine;
 
 public class CameraFollowObjectComponent : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    //empty class used as component
 }
