@@ -71,6 +71,9 @@ public class CharacterInputHandler : MonoBehaviour
         //view data
         networkInputData.aimForwardVector = localCameraHandler.transform.forward;
 
+        //camera position
+        networkInputData.cameraPosition = localCameraHandler.transform.position;
+
         //move data
         networkInputData.movementInput = moveInputVector;
 
