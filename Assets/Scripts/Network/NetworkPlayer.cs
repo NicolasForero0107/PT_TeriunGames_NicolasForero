@@ -12,6 +12,9 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
     [Networked(OnChanged = nameof(OnNickNameChanged))]
     public NetworkString<_16> nickName { get; set; }
 
+    //remote client token hash
+    [Networked] public int token { get; set; }
+
     bool isPublicJoinMessageSent = false;
 
     public LocalCameraHandler localCameraHandler;
@@ -37,22 +40,38 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
         {
             local = this;
 
-            RPC_SetNickName(PlayerPrefs.GetString("PlayerNickname"));
+            //disable main camera
+            if (Camera.main != null)
+                Camera.main.gameObject.SetActive(false);
+
+            //enable 1 audio listener
+            AudioListener audioListener = GetComponentInChildren<AudioListener>(true);
+            audioListener.enabled = true;
+
+            //enable the local camera
+            localCameraHandler.localCamera.enabled = true;
+
+            //detach camera if enabled
+            localCameraHandler.transform.parent = null;
+
+            //enable ui for local plasyer
+            localUI.SetActive(true);
+
+            RPC_SetNickName(GameManager.instance.playerNickName);
 
             Debug.Log("Spawned local player");
         }
         else
         {
-            //disable camera if we arent local player
-            Camera localCamera = GetComponentInChildren<Camera>();
-            localCamera.enabled = false;
+            //disable local camera for remote players
+            localCameraHandler.localCamera.enabled = false;
+
+            //disable ui for remote player
+            localUI.SetActive(false);
 
             //only 1 audio listener per scene, disable remote players' audio listener
             AudioListener audioListener = GetComponentInChildren<AudioListener>();
             audioListener.enabled = false;
-
-            //disable ui for remote player
-            localUI.SetActive(false);
 
             Debug.Log("Spawned remote player");
         }
@@ -106,5 +125,12 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
 
             isPublicJoinMessageSent = true;
         }
+    }
+
+    void OnDestroy()
+    {
+        //get rid of local camera if we get destroyed as a new one will be spawned with the new network player
+        if (localCameraHandler != null)
+            Destroy(localCameraHandler.gameObject);
     }
 }

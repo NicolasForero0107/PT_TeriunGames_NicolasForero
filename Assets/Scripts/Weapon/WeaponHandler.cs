@@ -5,12 +5,20 @@ using Fusion;
 
 public class WeaponHandler : NetworkBehaviour
 {
+    [Header("Prefabs")]
+    public GrenadeHandler grenadePrefab;
+
+    [Header("Effects")]
+    public ParticleSystem fireParticleSystem;
+
+    [Header("Aim")]
+    public Transform aimPoint;
+
+    [Header("Collision")]
+    public LayerMask collisionLayers;
+
     [Networked(OnChanged = nameof(OnFireChanged))]
     public bool isFiring { get; set; }
-
-    public ParticleSystem fireParticleSystem;
-    public Transform aimPoint;
-    public LayerMask collisionLayers;
 
     float lastTimeFired = 0;
 
